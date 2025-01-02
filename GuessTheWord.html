@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Guessing Game by AV</title>
+    <style>
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #df66c4, #47acdb);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #ffffff;
+        }
+
+        
+        .container {
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+        }
+
+        
+        h1 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            color: #ff4b5c;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        
+        .card {
+            font-size: 34px;
+            letter-spacing: 8px;
+            font-weight: bold;
+            color: #ecf0f1;
+            margin: 20px 0;
+            text-transform: uppercase;
+            background-color: #16a085;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .message {
+            font-size: 26px;
+            margin-top: 20px;
+            color: #0eee6b;
+        }
+
+        .wrong-guesses {
+            color: #e44e4e;
+            font-size: 22px;
+            margin-top: 15px;
+        }
+
+        .attempts {
+            font-size: 22px;
+            color: #34a6db;
+        }
+
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 18px 40px;
+            background: linear-gradient(145deg, #f39c12, #eb5610);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        button:disabled {
+            background: #BDC3C7;
+            cursor: not-allowed;
+        }
+
+        button:hover {
+            background: linear-gradient(145deg, #e64922, #4ae64a);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+        }
+
+        
+        @media screen and (max-width: 500px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            .card {
+                font-size: 28px;
+                
+            }
+
+            button {
+                padding: 14px 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>The Word Game</h1>
+        <p><strong>Hint:</strong> <span id="hint-text"></span></p>
+        <p id="displayWord" class="card">_ _ _ _</p>
+        <p id="attempts" class="attempts">Attempts Left: 3</p>
+        <p class="wrong-guesses"><strong>Incorrect Guesses:</strong> <span id="incorrect-guesses"></span></p>
+        <p id="message" class="message"></p>
+        <div class="button-group">
+            <button id="next-btn" onclick="nextQuestion()">Next Question</button>
+            <button id="restart-btn" onclick="resetGame()">Restart Game</button>
+        </div>
+    </div>
+
+    <script>
+        const words = [
+            { word: "elephant", hint: "A large animal with a trunk" },
+            { word: "piano", hint: "A musical instrument" },
+            { word: "sunflower", hint: "A tall plant with yellow flowers" },
+            { word: "mountain", hint: "A large natural elevation of the Earth's surface" },
+            { word: "guitar", hint: "A string instrument" },
+            { word: "butterfly", hint: "An insect with colorful wings" },
+            { word: "rainbow", hint: "A meteorological phenomenon with different colors" },
+            { word: "vampire", hint: "A mythical creature that drinks blood" },
+            { word: "robot", hint: "A machine that can be programmed to perform tasks" },
+            { word: "chocolate", hint: "A sweet treat made from cacao" },
+            { word: "apple", hint: "A crunchy, sweet fruit that comes in red, green, or yellow" },
+{ word: "banana", hint: "A long, yellow fruit that monkeys love" },
+{ word: "carrot", hint: "An orange vegetable that is good for your eyes" },
+{ word: "dog", hint: "A loyal, furry pet that barks" },
+{ word: "cat", hint: "A furry animal that purrs and loves to nap" },
+{ word: "ocean", hint: "A vast body of salt water covering most of the Earth" },
+{ word: "mountain", hint: "A large natural elevation of the Earth's surface" },
+{ word: "pencil", hint: "A tool for writing or drawing, often made of wood" },
+{ word: "book", hint: "A collection of written pages bound together" },
+{ word: "sun", hint: "The star at the center of our solar system" },
+{ word: "moon", hint: "Earth's natural satellite that shines at night" },
+{ word: "river", hint: "A large natural stream of water flowing to the sea" },
+{ word: "flower", hint: "A colorful bloom that grows on plants" },
+{ word: "bird", hint: "A creature with feathers that can usually fly" },
+{ word: "rain", hint: "Water that falls from the clouds in droplets" },
+{ word: "cloud", hint: "A visible mass of condensed water vapor in the sky" },
+{ word: "tree", hint: "A large plant with a trunk, branches, and leaves" },
+{ word: "cake", hint: "A sweet baked dessert often served on birthdays" },
+{ word: "butterfly", hint: "A colorful insect with large wings" },
+{ word: "fish", hint: "A creature that lives in water and has gills" },
+{ word: "coffee", hint: "A popular hot drink made from roasted beans" },
+{ word: "tea", hint: "A hot beverage made from steeped leaves" },
+{ word: "cheese", hint: "A dairy product made from milk, often yellow" },
+{ word: "bread", hint: "A staple food made of flour and water, often baked" },
+{ word: "ice", hint: "Frozen water" },
+{ word: "milk", hint: "A white liquid produced by mammals, used as a drink" },
+{ word: "clock", hint: "A device used to tell time" },
+{ word: "chair", hint: "A piece of furniture for sitting" },
+{ word: "table", hint: "A piece of furniture with a flat top and legs" },
+{ word: "phone", hint: "A device used for communication and calls" },
+{ word: "key", hint: "A small metal tool used to open locks" },
+{ word: "door", hint: "A movable barrier used to open and close an entry" },
+{ word: "window", hint: "An opening in a wall to let in light and air" },
+{ word: "lamp", hint: "A device that gives light" },
+{ word: "shoe", hint: "Footwear worn to protect the feet" },
+{ word: "hat", hint: "A covering for the head, often for fashion or warmth" },
+{ word: "glove", hint: "A covering for the hand" },
+{ word: "sock", hint: "A piece of clothing worn on the feet" },
+{ word: "shirt", hint: "A garment worn on the upper body" },
+{ word: "pants", hint: "A piece of clothing covering the legs" },
+{ word: "jacket", hint: "A garment worn for warmth or style" },
+{ word: "rainbow", hint: "A multicolored arc seen in the sky after rain" },
+{ word: "star", hint: "A celestial body that shines in the night sky" },
+{ word: "planet", hint: "A large body orbiting a star, like Earth" },
+{ word: "ship", hint: "A large vessel for traveling on water" },
+{ word: "car", hint: "A motor vehicle with four wheels" },
+{ word: "bicycle", hint: "A two-wheeled vehicle powered by pedaling" },
+{ word: "train", hint: "A series of connected cars traveling on tracks" },
+{ word: "airplane", hint: "A flying vehicle with wings" },
+{ word: "helicopter", hint: "A flying machine with rotating blades" },
+{ word: "rocket", hint: "A vehicle designed to travel into space" },
+{ word: "camera", hint: "A device for taking photographs or videos" },
+{ word: "computer", hint: "A machine used for calculations and data processing" },
+{ word: "television", hint: "An electronic device for watching shows and movies" },
+{ word: "radio", hint: "A device for receiving audio broadcasts" },
+{ word: "guitar", hint: "A stringed musical instrument" },
+{ word: "piano", hint: "A large musical instrument with keys" },
+{ word: "drum", hint: "A percussion instrument played by striking" },
+{ word: "violin", hint: "A string instrument played with a bow" },
+{ word: "flute", hint: "A woodwind instrument played by blowing" },
+{ word: "ball", hint: "A round object used in sports and games" },
+{ word: "kite", hint: "A light frame covered with material, flown in the wind" },
+{ word: "toy", hint: "An object for children to play with" },
+{ word: "doll", hint: "A small figure of a person, often for children" },
+{ word: "block", hint: "A solid piece of material, often used in building" },
+{ word: "robot", hint: "A machine capable of performing tasks automatically" },
+{ word: "snake", hint: "A long, legless reptile" },
+{ word: "tiger", hint: "A large, striped wild cat" },
+{ word: "lion", hint: "A big cat known as the king of the jungle" },
+{ word: "elephant", hint: "A large mammal with a trunk" },
+{ word: "horse", hint: "A strong animal often used for riding" },
+{ word: "zebra", hint: "A striped animal found in Africa" },
+{ word: "rabbit", hint: "A small animal with long ears" },
+{ word: "frog", hint: "An amphibian that jumps and croaks" },
+{ word: "treehouse", hint: "A small house built in a tree" },
+{ word: "bridge", hint: "A structure built to span a gap" },
+{ word: "castle", hint: "A large, fortified building" },
+{ word: "tent", hint: "A portable shelter made of fabric" },
+{ word: "map", hint: "A diagram showing the geography of an area" },
+{ word: "compass", hint: "A tool used to find direction" },
+{ word: "bookcase", hint: "A piece of furniture used to store books" },
+{ word: "mirror", hint: "A surface that reflects an image" },
+{ word: "pillow", hint: "A soft cushion for resting your head" },
+{ word: "blanket", hint: "A warm covering for sleeping" },
+{ word: "clock", hint: "A device that shows time" },
+{ word: "toy", hint: "An object for children to play with" },
+{ word: "glasses", hint: "Eyewear to improve vision" },
+{ word: "umbrella", hint: "A device for protection from rain" },
+{ word: "backpack", hint: "A bag carried on the back" },
+{ word: "ticket", hint: "A slip allowing entry or travel" },
+{ word: "passport", hint: "A document for international travel" },
+{ word: "towel", hint: "A cloth used for drying" },
+{ word: "sponge", hint: "A porous material for cleaning" },
+{ word: "soap", hint: "A substance used for washing" },
+{ word: "bucket", hint: "A container with a handle for carrying liquids" },
+{ word: "broom", hint: "A tool for sweeping" },
+{ word: "pan", hint: "A utensil for cooking" },
+{ word: "spoon", hint: "A utensil for eating or stirring" }
+
+        ];
+
+        let selectedWord;
+        let guessedList = [];
+        let incorrectGuesses = [];
+        let attemptsLeft;
+        let gameActive = true;
+
+        function getRandomWord() {
+            const randomIndex = Math.floor(Math.random() * words.length);
+            return words[randomIndex];
+        }
+
+        
+        function startGame() {
+            const selected = getRandomWord();
+            selectedWord = selected.word;
+            guessedList = [];
+            incorrectGuesses = [];
+            attemptsLeft = 3; // 
+
+            
+            document.getElementById("hint-text").textContent = selected.hint;
+
+            
+            let displayWord = "";
+            for (let i = 0; i < selectedWord.length; i++) {
+                displayWord += "_ ";
+            }
+            document.getElementById("displayWord").textContent = displayWord;
+            document.getElementById("incorrect-guesses").textContent = "";
+            document.getElementById("attempts").textContent = `Attempts Left: ${attemptsLeft}`;
+            document.getElementById("message").textContent = "";
+            gameActive = true;
+            document.getElementById("next-btn").style.display = "none";
+        }
+
+       
+        function guessLetter(letter) {
+            if (!gameActive || attemptsLeft <= 0) return;
+
+            letter = letter.toLowerCase();
+
+            if (!letter || letter.length !== 1) {
+                alert("Please enter a single letter.");
+                return;
+            }
+
+            if (guessedList.includes(letter)) {
+                alert("You already guessed that letter.");
+                return;
+            }
+
+            guessedList.push(letter);
+
+            
+            if (selectedWord.includes(letter)) {
+                let updatedDisplay = "";
+                let allLettersGuessed = true;
+                for (let i = 0; i < selectedWord.length; i++) {
+                    if (guessedList.includes(selectedWord[i])) {
+                        updatedDisplay += selectedWord[i] + " ";
+                    } else {
+                        updatedDisplay += "_ ";
+                        allLettersGuessed = false;
+                    }
+                }
+                document.getElementById("displayWord").textContent = updatedDisplay;
+
+                if (allLettersGuessed) {
+                    document.getElementById("message").textContent = "Congratulations! You guessed the word!";
+                    gameActive = false;
+                    document.getElementById("next-btn").style.display = "block";
+                }
+            } else {
+                incorrectGuesses.push(letter);
+                document.getElementById("incorrect-guesses").textContent = incorrectGuesses.join(", ");
+                attemptsLeft--;
+                document.getElementById("attempts").textContent = `Attempts Left: ${attemptsLeft}`;
+
+                if (attemptsLeft <= 0) {
+                    document.getElementById("message").textContent = `Sorry! You ran out of attempts. The word was ${selectedWord}`;
+                    gameActive = false;
+                    document.getElementById("next-btn").style.display = "block";
+                }
+            }
+        }
+
+       
+        function resetGame() {
+            startGame();
+        }
+
+      
+        function nextQuestion() {
+            startGame();
+        }
+
+        
+        startGame();
+
+       
+        window.addEventListener('keydown', function (event) {
+            if (gameActive && event.key.match(/[a-zA-Z]/)) {
+                guessLetter(event.key);
+            }
+        });
+    </script>
+</body>
+
+</html>
